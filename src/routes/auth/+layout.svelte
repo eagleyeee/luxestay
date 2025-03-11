@@ -19,12 +19,13 @@
 	<Loader />
 {:else}
 	<div class="bg-base-200 text-base-content flex h-screen w-full flex-row">
-		<div class="bg-neutral relative flex h-screen w-[65%] items-center justify-center align-middle">
+		<div class="hidden xl:flex bg-neutral relative h-screen w-full xl:w-[65%] items-center justify-center align-middle">
 			<img class="object-cover p-25 h-screen" alt="auth-background" src={hotelHero} />
 		</div>
 		<div
-			class="relative flex w-[35%] flex-col items-stretch justify-center px-12 py-8 md:px-24 lg:px-32"
+			class="relative flex w-full xl:w-[35%] flex-col items-center xl:items-stretch justify-center py-8 xl:px-28"
 		>
+		
 			<div class="flex justify-center">
 				<img src={MainLogo} alt="Logo" class="w-72" />
 			</div>
