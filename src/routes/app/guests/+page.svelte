@@ -12,7 +12,7 @@
 		isOpenCustomer = true;
 	};
 
-	console.log(isOpenCustomer);
+	//console.log(isOpenCustomer);
 </script>
 
 <div class="flex flex-col gap-4">
@@ -45,9 +45,12 @@
 		<table class="table">
 			<!-- head -->
 			<thead>
-				<tr>
-					<th>CNIC</th>
-					<th>Name</th>
+				<tr class=" text-neutral">
+					<th><input type="checkbox" class="checkbox" /></th>
+					<th class="flex flex-col"
+						><div>Name &</div>
+						<span>CINC</span>
+					</th>
 					<th>Email</th>
 					<th>Phone</th>
 					<th>Address</th>

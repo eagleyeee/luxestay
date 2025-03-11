@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
+	import { enhance } from '$app/forms';
+
 	import Nav from '$lib/components/layout/sidebar/Nav.svelte';
 
 	import SqaureLogo from '$lib/assets/luxestay-square.png';
@@ -9,6 +11,8 @@
 	interface Props {
 		isToggle: boolean;
 	}
+
+	let logoutLoading = $state(false);
 
 	let { isToggle }: Props = $props();
 
@@ -23,18 +27,18 @@
 	};
 
 	let menus = [
-		{ title: 'Dashboard', link: '/dashboard', iconClass: 'icon-[ri--dashboard-line]' },
-		{
-			title: 'Customers',
-			link: '/customers',
-			iconClass: 'icon-[ri--user-5-line]'
-		},
+		{ title: 'Dashboard', link: '/app/dashboard', iconClass: 'icon-[ri--dashboard-line]' },
 		{
 			title: 'Reservations',
-			link: '/reservations',
+			link: '/app/reservations',
 			iconClass: 'icon-[ri--bookmark-3-line]'
 		},
-		{ title: 'Rooms', link: '/rooms', iconClass: 'icon-[ri--home-5-line]' }
+		{
+			title: 'Guests',
+			link: '/app/guests',
+			iconClass: 'icon-[ri--user-5-line]'
+		},
+		{ title: 'Rooms', link: '/app/rooms', iconClass: 'icon-[ri--home-5-line]' }
 	];
 </script>
 
@@ -86,15 +90,34 @@
 				<span class="text-left text-xs">Manager</span>
 			</div>
 		</a>
-		<button
-			class="btn btn-ghost btn-square text-neutral transition-all duration-[0.2s] ease-in-out {isToggle ===
-				true || onHover === true
-				? ''
-				: 'hidden'}"
-			aria-label="sidebar-toggle"
+
+		<form
+			action="/app/logout"
+			method="POST"
+			use:enhance={() => {
+				logoutLoading = true;
+				return async ({ update }) => {
+					await update();
+					logoutLoading = false;
+				};
+			}}
 		>
-			<span transition:fade class="icon-[ri--logout-circle-r-line] size-6"></span>
-		</button>
+			<button
+				class="btn btn-ghost btn-square text-neutral transition-all duration-[0.2s] ease-in-out {isToggle ===
+					true || onHover === true
+					? ''
+					: 'hidden'}"
+				aria-label="logout"
+				type="submit"
+			>
+				<span
+					transition:fade
+					class="{logoutLoading === true
+						? 'icon-[ri--loader-3-line] animate-spin'
+						: 'icon-[ri--logout-circle-r-line]'} size-6"
+				></span>
+			</button>
+		</form>
 	</div>
 </nav>
 

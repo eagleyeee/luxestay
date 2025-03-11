@@ -1,19 +1,53 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-	import { page } from '$app/state';
-
-	import Sidebar from '$lib/components/layout/sidebar/Sidebar.svelte';
-	import Header from '$lib/components/header/Header.svelte';
-
 	import '$lib/styles/app.css';
 
-	let { children } = $props();
+	import { goto } from '$app/navigation';
 
-	let isToggleSidebar = $state(false);
+	import Loader from '$lib/components/shared/Loader.svelte';
 
-	const toggleSidebar = () => {
-		isToggleSidebar = !isToggleSidebar;
-	};
+	import { invalidate } from '$app/navigation';
+
+	let { data, children } = $props();
+	let { session, supabase } = $derived(data);
+
+	let isPageLoaded = $state(false);
+
+	$effect(() => {
+		setTimeout(() => {
+			isPageLoaded = true;
+		}, 1500);
+	});
+
+	$effect(() => {
+		/*
+		const { data } = supabase.auth.onAuthStateChange(async (_, newSession) => {
+			const { data, error } = await supabase.auth.getUser();
+
+			if (error || !data.user) {
+				invalidate('supabase:auth');
+				return;
+			}
+
+			if (newSession?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			}
+		});
+
+		return () => data.subscription.unsubscribe();
+		*/
+		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
+			if (!newSession) {
+				setTimeout(() => {
+					goto('/auth/login', { invalidateAll: true });
+				});
+			}
+			if (newSession?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			}
+		});
+
+		return () => data.subscription.unsubscribe();
+	});
 </script>
 
 <svelte:head>
@@ -26,31 +60,8 @@
 	<title>LuxeStay - Where Value Meets Elegance</title>
 </svelte:head>
 
-<div class="bg-base-200 text-base-content flex h-screen flex-row">
-	<Sidebar isToggle={isToggleSidebar} />
-	<div class="flex-auto">
-		<Header>
-			{#snippet sidebarToggleButton()}
-				<button
-					onclick={toggleSidebar}
-					class="btn btn-ghost btn-square text-neutral"
-					aria-label="sidebar-toggle"
-				>
-					<span
-						transition:fade
-						class="{isToggleSidebar === true
-							? 'icon-[ri--close-circle-line]'
-							: 'icon-[ri--menu-4-fill]'} size-6"
-					></span>
-				</button>
-			{/snippet}
-			{#snippet pageTitle()}
-				<h2 class="text-neutral text-xl font-bold capitalize">{page.url.pathname.slice(1)}</h2>
-			{/snippet}
-		</Header>
-
-		<main class="p-6">
-			{@render children()}
-		</main>
-	</div>
-</div>
+{#if !isPageLoaded}
+	<Loader />
+{:else}
+	{@render children()}
+{/if}
